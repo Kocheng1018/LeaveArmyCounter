@@ -17,35 +17,49 @@
       <label>放假時間</label>
       <input id="endTime" type="datetime-local">
     </div>
-    <button onClick="countTime()">計算</button>
+    <button onClick="countTime()">計算自訂時間</button>
+    <button onClick="count18Time()">快速夭八計算</button>
     <div class="result">
       <div class="present-area">
-        <label>已完成 <strong id="present">asdfj</strong> %</label>
+        <label>已完成 <strong id="present"></strong> %</label>
       </div>
       <div class="last-min-area">
-        <label>還剩 <strong id="last-min">asdf</strong> 分鐘</label>
+        <label>還剩 <strong id="last-min"></strong> 小時</label>
       </div>
     </div>
     <script>
-      function countTime(){
-        if(document.getElementById("startTime").value === "" || document.getElementById("endTime").value === "") {
+      function count18Time(){
           let fri = moment().day("Friday").hours(16).minutes(0).format("YYYY-MM-DD HH:mm")
           let mon = moment().day("Monday").hours(0).minutes(0).format("YYYY-MM-DD HH:mm")
+          let now = moment();
+          if(!now.isBetween(mon, fri)){
+            display("不要看 放假拉", "不要看 放假拉");
+            return
+          }
           let allRange = moment().day("Friday").diff(moment().day("Monday"));
           let finishRange = moment().diff(mon);
           let needRange = moment().diff(fri, "minutes", true);
           let present = (finishRange / allRange) * 100;
-          display(present, needRange);
+          display(present.toFixed(2), needRange.toFixed(2));
+          return
+      }
+      function countTime(){
+        if(document.getElementById("startTime").value === "" || document.getElementById("endTime").value === "") {
+          display("無開始或結束", "無開始或結束");
           return
         }
         let startTime = moment(document.getElementById("startTime").value, "YYYY-MM-DD HH:mm");
         let endTime = moment(document.getElementById("endTime").value, "YYYY-MM-DD HH:mm");
-        endTime = endTime.hours(16).minutes(0);
+        let now = moment();
+        if(!now.isBetween(startTime, endTime)){
+          display("今天不在日期區間內喔", "今天不在日期區間內喔");
+          return
+        }
         let allRange = endTime.diff(startTime);
         let finishRange = moment().diff(startTime);
         let present = (finishRange / allRange) * 100;
-        let needRange = endTime.diff(moment(), "minutes", true);
-        display(present, needRange);
+        let needRange = endTime.diff(moment(), "hours", true);
+        display(present.toFixed(2), needRange.toFixed(2));
       }
       function display(present, mins){
         document.getElementById("present").innerText = present;
@@ -54,14 +68,39 @@
     </script>
   </body>
   <style>
-    body {
+    html {
+      width: 100vw;
       height: 100vh;
+    }
+    body {
+      width: 100%;
+      height: 100%;
       backGround-color: lightblue;
       display: flex;
       flex-direction: column;
       gap: 20px;
       align-items: center;
       font-size: 50px;
+    }
+    input {
+      height: 30px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #7546C9;
+      width: 120px;
+      height: 30px;
+      font-size: 16px;
+      border-radius: 5px;
+      color: white;
+    }
+    button:hover {
+      cursor: pointer;
+    }
+    .start, .end {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
   </style>
 </html>
